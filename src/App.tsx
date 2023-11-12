@@ -1,12 +1,14 @@
 import { Routes, Route } from "react-router-dom"
 import LandingPage from "./pages/landing_page"
 import DetailProduct from "./pages/detail_product"
+import Emsifa from "./pages/emsifa"
 
 export default function App() {
   return (
     <Routes>
       <Route path="/home" element={<LandingPage />} />
       <Route path="/detailproduct/:id" element={<DetailProduct />} />
+      <Route path="/emsifa" element={<Emsifa />} />
     </Routes>
   )
 }
