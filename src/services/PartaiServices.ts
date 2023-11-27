@@ -8,7 +8,7 @@ export default new class PartaiServices {
   private readonly PartaiRepository: Repository<Partai> = AppDataSource.getRepository(Partai)
   async find(req: Request, res: Response): Promise<Response> {
     try {
-      const partai = await this.PartaiRepository.find()
+      const partai = await this.PartaiRepository.find({ order: { id: "ASC" } })
       return res.status(200).json({
         status: "success",
         data: partai,
@@ -88,7 +88,8 @@ export default new class PartaiServices {
         nama: value.nama,
         ketuaUmum: value.ketuaUmum,
         visiMisi: value.visiMisi,
-        alamat: value.alamat
+        alamat: value.alamat,
+        updatedAt: new Date
       })
 
       await this.PartaiRepository.update(req.params.id, obj)

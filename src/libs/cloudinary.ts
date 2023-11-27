@@ -1,11 +1,14 @@
 import { v2 as cloudinary } from "cloudinary"
+import * as dotenv from "dotenv"
+
+dotenv.config()
 
 export default new class CloudinaryConfig {
   upload() {
     cloudinary.config({
-      cloud_name: 'deheo4nfk',
-      api_key: '183914859286216',
-      api_secret: 'WIjUi4Uyr81gCU97TDBI_dw7i8k',
+      cloud_name: process.env.CLOUD_NAME,
+      api_key: process.env.API_KEY,
+      api_secret: process.env.API_SECRET,
       secure: true
     })
   }

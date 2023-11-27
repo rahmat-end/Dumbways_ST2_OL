@@ -3,7 +3,7 @@ import * as cors from "cors"
 import { Request, Response } from "express"
 import { AppDataSource } from "./data-source"
 import router from "./route"
-import cloudinary from "./libs/cloudinary"
+// import cloudinary from "./libs/cloudinary"
 import fileUpload = require("express-fileupload")
 import * as path from "path"
 
@@ -22,7 +22,7 @@ AppDataSource.initialize().then(async () => {
 
     //setup cloudinary
     app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }))
-    cloudinary.upload()
+    // cloudinary.upload()
 
     //setup hbs
     app.set('view engine', 'hbs')

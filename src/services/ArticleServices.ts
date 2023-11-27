@@ -2,14 +2,15 @@ import { Repository } from "typeorm"
 import { Article } from "../entities/Article"
 import { AppDataSource } from "../data-source"
 import { Request, Response } from "express"
-import { articleSchema } from "../utils/ArticleValidator"
-import cloudinary from "../libs/cloudinary"
+import { articleSchema, articleUpdateSchema } from "../utils/ArticleValidator"
+import cloudinary from "../middlewares/cloudinary"
+// import cloudinary from "../libs/cloudinary"
 
 export default new class ArticleServices {
   private readonly ArticleRepository: Repository<Article> = AppDataSource.getRepository(Article)
   async find(req: Request, res: Response): Promise<Response> {
     try {
-      const article = await this.ArticleRepository.find()
+      const article = await this.ArticleRepository.find({ order: { id: "ASC" } })
       return res.status(200).json({
         status: "success",
         data: article,
@@ -39,24 +40,57 @@ export default new class ArticleServices {
 
   async add(req: Request, res: Response): Promise<Response> {
     try {
-      const body = req.body
+      const data = req.files
 
-      const { error, value } = articleSchema.validate(body)
-      if(error) return res.status(400).json({ message: error.message })
+      if(!req.files) return res.status(500).json({ message: "No file was uploaded" })
 
-      // const cloudinaryResponse = await cloudinary.destination(value.image)
-      const obj = this.ArticleRepository.create({
-        title: value.title,
-        image: value.image,
-        description: value.description
-      })
+      const file = JSON.parse(JSON.stringify(data))
+      const path = file["image"].tempFilePath
 
-      const article = await this.ArticleRepository.save(obj)
-      return res.status(200).json({
-        status: "success",
-        data: article,
-        message: "Successfully! Record has been added"
-      })
+      cloudinary.uploader.upload(
+        path,
+        async(errorCloudinary: any, result: any) => {
+          if(errorCloudinary) {
+            return res.status(400).json({ message: errorCloudinary.message })
+          }
+
+          const body = {
+            ... req.body,
+            image: path
+          }
+          const { error, value } = articleSchema.validate(body)
+          if(error) return res.status(400).json({ message: error.message })
+
+          const obj = this.ArticleRepository.create({
+            title: value.title,
+            image: result.secure_url,
+            description: value.description
+          })
+
+          const article = await this.ArticleRepository.save(obj)
+          return res.status(200).json({
+            status: "success",
+            data: article,
+            message: "Successfully! Record has been added"
+          })
+        }
+      )
+      // const { error, value } = articleSchema.validate(body)
+      // if(error) return res.status(400).json({ message: error.message })
+
+      // // const cloudinaryResponse = await cloudinary.destination(value.image)
+      // const obj = this.ArticleRepository.create({
+      //   title: value.title,
+      //   image: value.image,
+      //   description: value.description
+      // })
+
+      // const article = await this.ArticleRepository.save(obj)
+      // return res.status(200).json({
+      //   status: "success",
+      //   data: article,
+      //   message: "Successfully! Record has been added"
+      // })
     } catch (err) {
       return res.status(500).json({ message: "Something error while inserting data article"})
     }
@@ -66,14 +100,21 @@ export default new class ArticleServices {
     try {
       const body = req.body
 
-      const { error, value } = articleSchema.validate(body)
+      const { error, value } = articleUpdateSchema.validate(body)
       if(error) return res.status(400).json({ message: error.message })
 
       // const cloudinaryResponse = await cloudinary.destination(value.image)
+      const articleImage = await this.ArticleRepository.findOne({
+        where: {
+          id: JSON.parse(req.params.id)
+        }
+      })
+
       const obj = this.ArticleRepository.create({
         title: value.title,
-        image: value.image,
-        description: value.description
+        image: articleImage.image,
+        description: value.description,
+        updatedAt: new Date
       })
 
       await this.ArticleRepository.update(req.params.id, obj)

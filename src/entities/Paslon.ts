@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, Timestamp, OneToMany } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, Timestamp, OneToMany, ManyToOne, JoinColumn } from "typeorm"
 import { Voter } from "./Voter"
+import { Partai } from "./Partai"
 
 @Entity()
 export class Paslon {
@@ -18,6 +19,15 @@ export class Paslon {
 
     @OneToMany(() => Voter, (voter) => voter.paslon)
     voters: Voter[]
+
+    @ManyToOne(() => Partai, (partai) => partai.paslons, {
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE"
+    })
+    @JoinColumn([
+        { name: "partaiId", referencedColumnName: "id" }
+    ])
+    partai: Partai
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
     createdAt: Timestamp

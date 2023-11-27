@@ -5,7 +5,8 @@ export const userSchema = Joi.object({
   alamat: Joi.string().required(),
   jenisKelamin: Joi.string().required(),
   username: Joi.string().required(),
-  password: Joi.string().required()
+  password: Joi.string().required(),
+  role: Joi.string().required()
 })
 
 export const loginSchema = Joi.object({

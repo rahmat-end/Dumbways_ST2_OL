@@ -10,7 +10,7 @@ export default new class UserServices {
   private readonly UserRepository: Repository<User> = AppDataSource.getRepository(User)
   async find(req: Request, res: Response): Promise<Response> {
     try {
-      const user = await this.UserRepository.find()
+      const user = await this.UserRepository.find({ order: { id: "ASC" } })
       return res.status(200).json({
         status: "success",
         data: user,
@@ -26,7 +26,7 @@ export default new class UserServices {
       const loginSession = res.locals.loginSession
       const user = await this.UserRepository.findOne({
         where: {
-            id: loginSession.user.id
+            id: loginSession.obj.id
         }
       })
       return res.status(200).json({
@@ -46,20 +46,29 @@ export default new class UserServices {
       const { error, value } = userSchema.validate(body)
       if(error) return res.status(409).json({ message: error.message })
 
-      const isUsernameUsed = await this.UserRepository.count({ where: { username: value.username }})
-      if(isUsernameUsed > 0) return res.status(409).json({ message: "Username already in use !" })
+      const isUsernameUsed = await this.UserRepository.findOne({ where: { username: value.username } })
+      if(isUsernameUsed) return res.status(409).json({ message: "Username already in use !" })
+      
+      const getUser = await this.UserRepository.find()
+      let isPasswordUsed: any
+      for (let i = 0; i < getUser.length; i++) {
+        if(await bcrypt.compare(value.password, getUser[i].password)) {
+          isPasswordUsed = true
+          break 
+        } else {
+          isPasswordUsed = false
+        }
+      }
+      if(isPasswordUsed) return res.status(409).json({ message: "Password already in use !" })
 
       const hashPassword = await bcrypt.hash(value.password, 10)
-
-      const isPasswordUsed = await this.UserRepository.count({ where: { password: hashPassword }})
-      if(isPasswordUsed > 0) return res.status(409).json({ message: "Password already in use !" })
-
       const obj = this.UserRepository.create({
         fullName: value.fullName,
         alamat: value.alamat,
         jenisKelamin: value.jenisKelamin,
         username: value.username,
-        password: hashPassword
+        password: hashPassword,
+        role: value.role
       })
 
       const user = await this.UserRepository.save(obj)
@@ -88,7 +97,8 @@ export default new class UserServices {
 
       const obj = this.UserRepository.create({
         id: isUsernameRegistered.id,
-        fullName: isUsernameRegistered.fullName
+        fullName: isUsernameRegistered.fullName,
+        role: isUsernameRegistered.role
       })
       const token = jwt.sign({ obj }, 'SECRET_KEY', { expiresIn: 3600 })
       return res.status(200).json({
@@ -107,7 +117,7 @@ export default new class UserServices {
       const loginSession = res.locals.loginSession
       const user = await this.UserRepository.findOne({
         where: {
-          id: loginSession.user.id
+          id: loginSession.id
         }
       })
 
@@ -125,31 +135,44 @@ export default new class UserServices {
   async update(req: Request, res: Response): Promise<Response> {
     try {
       const body = req.body
+      const loginSession = res.locals.loginSession
 
       const { error, value } = userSchema.validate(body)
       if(error) return res.status(400).json({ message: error.message })
 
-      const isUsernameUsed = await this.UserRepository.count({ where: { username: value.username }})
-      if(isUsernameUsed > 0) return res.status(409).json({ message: "Username already in use !" })
+      const isUsernameUsed = await this.UserRepository.findOne({ where: { username: value.username } })
+      if(isUsernameUsed) return res.status(409).json({ message: "Username already in use !" })
+
+      const getUser = await this.UserRepository.find()
+      let isPasswordUsed: any
+      for (let i = 0; i < getUser.length; i++) {
+        if(await bcrypt.compare(value.password, getUser[i].password)) {
+          isPasswordUsed = true
+          break 
+        } else {
+          isPasswordUsed = false
+        }
+      }
+      if(isPasswordUsed) return res.status(409).json({ message: "Password already in use !" })
+      // const getUser = await this.UserRepository.findOne({ where: { id: loginSession.obj.id } })
+      // const isPasswordUsed = await bcrypt.compare(value.password, getUser.password)
+      // if(isPasswordUsed) return res.status(409).json({ message: "Password already in use !" })
 
       const hashPassword = await bcrypt.hash(value.password, 10)
-
-      const isPasswordUsed = await this.UserRepository.count({ where: { password: hashPassword }})
-      if(isPasswordUsed > 0) return res.status(409).json({ message: "Password already in use !" })
-
       const obj = this.UserRepository.create({
         fullName: value.fullName,
         alamat: value.alamat,
         jenisKelamin: value.jenisKelamin,
         username: value.username,
-        password: hashPassword
+        password: hashPassword,
+        role: value.role,
+        updatedAt: new Date
       })
 
-      const loginSession = res.locals.loginSession
-      await this.UserRepository.update(loginSession.user.id, obj)
+      await this.UserRepository.update(loginSession.obj.id, obj)
       const user = await this.UserRepository.findOne({
         where: {
-          id: loginSession.user.id
+          id: loginSession.obj.id
         }
       })
       return res.status(200).json({
@@ -165,7 +188,7 @@ export default new class UserServices {
   async delete(req: Request, res: Response): Promise<Response> {
     try {
       const loginSession = res.locals.loginSession
-      const user = await this.UserRepository.delete(loginSession.user.id)
+      const user = await this.UserRepository.delete(loginSession.obj.id)
       return res.status(200).json({
         status: "success",
         data: user,

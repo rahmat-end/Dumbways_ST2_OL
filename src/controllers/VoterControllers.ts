@@ -8,6 +8,12 @@ export default new class VoterControllers {
   findOne(req: Request, res: Response) {
     VoterServices.findOne(req, res)
   }
+  listVoter(req: Request, res: Response) {
+    VoterServices.listVoter(req, res)
+  }
+  dashboard(req: Request, res: Response) {
+    VoterServices.dashboard(req, res)
+  }
   add(req: Request, res: Response) {
     VoterServices.add(req, res)
   }

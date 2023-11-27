@@ -5,3 +5,7 @@ export const articleSchema = Joi.object({
   image: Joi.string().required(),
   description: Joi.string().required()
 })
+export const articleUpdateSchema = Joi.object({
+  title: Joi.string().required(),
+  description: Joi.string().required()
+})
