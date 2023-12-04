@@ -18,5 +18,5 @@ func DatabaseInit() {
 		panic(err)
 	}
 
-	fmt.Println("Database berhasil koneksi cuy")
+	fmt.Println("Database connected")
 }

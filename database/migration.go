@@ -15,5 +15,5 @@ func RunMigration() {
 		panic(err)
 	}
 
-	fmt.Println("Migration success cuy")
+	fmt.Println("Migration success")
 }
