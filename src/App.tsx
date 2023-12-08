@@ -1,4 +1,9 @@
 import { Routes, Route } from "react-router-dom"
+import Games from "./pages/games"
+import Salary from "./pages/salary"
+import WordScramb from "./pages/word_scramb"
+import CountDuration from "./pages/count_duration"
+
 import LandingPage from "./pages/landing_page"
 import DetailProduct from "./pages/detail_product"
 import Emsifa from "./pages/emsifa"
@@ -6,6 +11,11 @@ import Emsifa from "./pages/emsifa"
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<Games />} />
+      <Route path="/salary" element={<Salary />} />
+      <Route path="/word-scramb" element={<WordScramb />} />
+      <Route path="/count-duration" element={<CountDuration />} />
+
       <Route path="/home" element={<LandingPage />} />
       <Route path="/detailproduct/:id" element={<DetailProduct />} />
       <Route path="/emsifa" element={<Emsifa />} />
