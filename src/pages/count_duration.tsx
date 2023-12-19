@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react"
 
-// const COUNTDOWN_TARGET = new Date("2023-06-31T23:59:59")
-
-
 export default function CountDuration() {
-    let [date, setDate] = useState(Date.now())
-    let getTimeLeft = () => {
+    let [date, setDate] = useState<Date | null>()
+    let getTimeLeft = (date: any) => {
         let totalTimeLeft = +new Date(date) - +new Date();
         let days = Math.floor(totalTimeLeft / (1000 * 60 * 60 * 24));
         let hours = Math.floor((totalTimeLeft / (1000 * 60 * 60)) % 24);
@@ -13,17 +10,17 @@ export default function CountDuration() {
         let seconds = Math.floor((totalTimeLeft / 1000) % 60);
         return { days, hours, minutes, seconds };
     }
-    let [timeLeft, setTimeLeft] = useState(() => getTimeLeft())
+    let [timeLeft, setTimeLeft] = useState(() => getTimeLeft(date))
     
 	useEffect(() => {
 		const timer = setInterval(() => {
-			setTimeLeft(getTimeLeft());
+			setTimeLeft(getTimeLeft(date));
 		}, 1000);
 
 		return () => {
 			clearInterval(timer);
 		};
-	}, []);
+	}, [date]);
     function handleDate(event: any) {
         setDate(date = event.target.value)
     }
@@ -35,8 +32,8 @@ export default function CountDuration() {
             <div className='countdown py-3 px-5 border rounded-3 mt-3'>
                 <p>Enter the Target Date and Time:</p>
                 <input type="datetime-local" className="p-2 me-3" onChange={handleDate}/>
-                <button className="btn btn-primary px-5 rounded rounded-4">Start</button>
-                <p>Countdown:{date}</p>
+                {/* <button className="btn btn-primary px-5 rounded rounded-4">Start</button> */}
+                <p>Countdown:</p>
                 <div className='content'>
                     {Object.entries(timeLeft).map((el) => {
                         const label = el[0];

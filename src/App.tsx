@@ -3,6 +3,8 @@ import Games from "./pages/games"
 import Salary from "./pages/salary"
 import WordScramb from "./pages/word_scramb"
 import CountDuration from "./pages/count_duration"
+import CurrencyConvert from "./pages/currency_convert"
+import MobileLegend from "./pages/mobile_legend"
 
 import LandingPage from "./pages/landing_page"
 import DetailProduct from "./pages/detail_product"
@@ -15,6 +17,8 @@ export default function App() {
       <Route path="/salary" element={<Salary />} />
       <Route path="/word-scramb" element={<WordScramb />} />
       <Route path="/count-duration" element={<CountDuration />} />
+      <Route path="/currency-convert" element={<CurrencyConvert />} />
+      <Route path="/mobile-legend" element={<MobileLegend />} />
 
       <Route path="/home" element={<LandingPage />} />
       <Route path="/detailproduct/:id" element={<DetailProduct />} />

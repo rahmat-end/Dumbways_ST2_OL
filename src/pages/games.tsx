@@ -49,7 +49,7 @@ export default function Games() {
                         </div>
                         <div className="card-body">
                             <p className="card-text">Currency conversion that has been determined in value</p>
-                            <a href="#" className="btn btn-primary">Check this out</a>
+                            <a href="/currency-convert" className="btn btn-primary">Check this out</a>
                         </div>
                         <div className="card-footer">DONE</div>
                     </div>
@@ -62,7 +62,7 @@ export default function Games() {
                         </div>
                         <div className="card-body">
                             <p className="card-text">Search for mobile legend hero names and other detailed information</p>
-                            <a href="#" className="btn btn-primary">Check this out</a>
+                            <a href="/mobile-legend" className="btn btn-primary">Check this out</a>
                         </div>
                         <div className="card-footer">DONE</div>
                     </div>
